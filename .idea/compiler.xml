@@ -11,5 +11,11 @@
         <module name="com.study.data-jpa.main" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="data-jpa.data-jpa.main" target="11" />
+      <module name="data-jpa.data-jpa.main~1" target="11" />
+      <module name="data-jpa.data-jpa.test" target="11" />
+      <module name="data-jpa.data-jpa.test~1" target="11" />
+    </bytecodeTargetLevel>
   </component>
 </project>
