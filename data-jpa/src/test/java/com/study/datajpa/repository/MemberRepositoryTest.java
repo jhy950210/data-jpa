@@ -7,9 +7,15 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +30,8 @@ class MemberRepositoryTest {
 
     @Autowired MemberRepository memberRepository;
     @Autowired TeamRepository teamRepository;
+    @PersistenceContext
+    EntityManager entityManager;
 
     @Test
     public void testMember(){
@@ -108,6 +116,59 @@ class MemberRepositoryTest {
         List<Member> aaa = memberRepository.findListByUsername("AAA");
         Member aaa1 = memberRepository.findMemberByUsername("AAA");
         Optional<Member> aaa2 = memberRepository.findOptinalByUsername("AAA");
+    }
+
+    @Test
+    public void paging() throws Exception {
+        //given
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 10));
+        memberRepository.save(new Member("member3", 10));
+        memberRepository.save(new Member("member4", 10));
+        memberRepository.save(new Member("member5", 10));
+
+        int age = 10;
+        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
+
+        //when
+        Page<Member> members = memberRepository.findByAge(age, pageRequest);
+
+        Page<MemberDto> toMap = members.map(member -> new MemberDto(member.getId(), member.getUsername(), null));
+
+        //Slice<Member> members = memberRepository.findSliceByAge(age, pageRequest);
+
+
+        //then
+        List<Member> content = members.getContent();
+        //long totalElements = members.getTotalElements();
+
+        assertThat(content.size()).isEqualTo(3);
+        //assertThat(members.getTotalElements()).isEqualTo(5);
+        assertThat(members.getNumber()).isEqualTo(0);
+        //assertThat(members.getTotalPages()).isEqualTo(2);
+        assertThat(members.isFirst()).isTrue();
+        assertThat(members.hasNext()).isTrue();
+
+    }
+
+    @Test
+    public void bulkUpdate() throws Exception {
+        //given
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 19));
+        memberRepository.save(new Member("member3", 20));
+        memberRepository.save(new Member("member4", 21));
+        memberRepository.save(new Member("member5", 40));
+
+        //when
+        int resultCount = memberRepository.bulkAgePlus(20);
+
+        Member member5 = memberRepository.findMemberByUsername("member5");
+        System.out.println("member5 = " + member5);
+
+
+        //then
+        assertThat(resultCount).isEqualTo(3);
     }
 
 }
