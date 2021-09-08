@@ -1,4 +1,5 @@
 # spring-data-jpa
+for Spring Data JPA study
 
 **핵심 라이브러리**
 
