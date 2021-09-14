@@ -1,9 +1,15 @@
 package com.study.datajpa.entity;
 
+import lombok.Getter;
+
 import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import java.time.LocalDateTime;
 
+@MappedSuperclass
+@Getter
 public class JpaBaseEntity {
 
     @Column(updatable = false)
@@ -15,5 +21,10 @@ public class JpaBaseEntity {
         LocalDateTime now = LocalDateTime.now();
         createdTime = now;
         updatedTime = now;
+    }
+
+    @PreUpdate
+    public void preUpdate(){
+        updatedTime = LocalDateTime.now();
     }
 }
